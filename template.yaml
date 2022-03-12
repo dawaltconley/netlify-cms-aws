@@ -158,3 +158,11 @@ Resources:
             method.response.header.Access-Control-Allow-Headers: false
             method.response.header.Access-Control-Allow-Methods: false
             method.response.header.Access-Control-Allow-Origin: false
+
+Outputs:
+  NetlifyCMSRestApiId:
+    Description: Logical ID for the Netlify CMS Rest API
+    Value: !Ref GitHubAuthApi
+  NetlifyCMSRootResourceId:
+    Description: Root resource ID for the Netlify CMS Rest API
+    Value: !GetAtt [ GitHubAuthApi, RootResourceId ]
