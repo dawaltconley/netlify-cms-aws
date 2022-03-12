@@ -22,13 +22,6 @@ Resources:
         Followed by netlify-cms-auth-token-handler.
       Policies:
         - AWSLambdaBasicExecutionRole
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /auth
-            Method: get
-            # RestApiId:
 
   netlifyCMSAuthTokenHandler2:
     Type: AWS::Serverless::Function
@@ -46,10 +39,123 @@ Resources:
         Preceded by netlify-cms-auth-redirect.
       Policies:
         - AWSLambdaBasicExecutionRole
-      Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /callback
-            Method: get
-            # RestApiId:
+
+  GitHubAuthApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: NetlifyCMSGitHubAuth
+
+  GitHubAuthResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref GitHubAuthApi
+      ParentId: !GetAtt [ GitHubAuthApi, RootResourceId ]
+      PathPart: auth
+
+  GitHubAuthMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref GitHubAuthApi
+      ResourceId: !Ref GitHubAuthResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        # Uri: !GetAtt [ netlifyCMSAuthRedirect2, Arn ]
+        Uri: !Sub
+          - arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Arn}/invocations
+          - Arn: !GetAtt [ netlifyCMSAuthRedirect2, Arn ]
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels:
+            application/json: 'Empty'
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: false
+
+  # CORS Options Method
+  GitHubAuthOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref GitHubAuthApi
+      ResourceId: !Ref GitHubAuthResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters: 
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: 'Empty'
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+
+  GitHubCallbackResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref GitHubAuthApi
+      ParentId: !GetAtt [ GitHubAuthApi, RootResourceId ]
+      PathPart: callback
+
+  GitHubCallbackMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref GitHubAuthApi
+      ResourceId: !Ref GitHubCallbackResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub
+          - arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Arn}/invocations
+          - Arn: !GetAtt [ netlifyCMSAuthTokenHandler2, Arn ]
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels:
+            application/json: 'Empty'
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: false
+
+  # CORS Options Method
+  GitHubCallbackOptions:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref GitHubAuthApi
+      ResourceId: !Ref GitHubCallbackResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters: 
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: 'Empty'
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
