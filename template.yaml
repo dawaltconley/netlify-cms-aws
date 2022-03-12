@@ -23,6 +23,17 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
 
+  RedirectApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref authRedirect
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub
+        - arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${GitHubAuthApi}/*/${Method}/${Path}
+        - Method: GET
+          Path: auth
+
   tokenHandler:
     Type: AWS::Serverless::Function
     Properties:
@@ -39,6 +50,17 @@ Resources:
         Preceded by netlify-cms-auth-redirect.
       Policies:
         - AWSLambdaBasicExecutionRole
+
+  TokenHandlerApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref tokenHandler
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com # limit with SourceArn or SourceAccount?
+      SourceArn: !Sub
+        - arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${GitHubAuthApi}/*/${Method}/${Path}
+        - Method: GET
+          Path: callback
 
   GitHubAuthApi:
     Type: AWS::ApiGateway::RestApi
