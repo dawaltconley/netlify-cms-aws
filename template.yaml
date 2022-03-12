@@ -6,7 +6,7 @@ Transform:
 
 Resources:
 
-  netlifyCMSAuthRedirect2:
+  authRedirect:
     Type: AWS::Serverless::Function
     Properties:
       Handler: redirect.handler
@@ -23,7 +23,7 @@ Resources:
       Policies:
         - AWSLambdaBasicExecutionRole
 
-  netlifyCMSAuthTokenHandler2:
+  tokenHandler:
     Type: AWS::Serverless::Function
     Properties:
       Handler: token-handler.handler
@@ -62,10 +62,9 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        # Uri: !GetAtt [ netlifyCMSAuthRedirect2, Arn ]
         Uri: !Sub
           - arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Arn}/invocations
-          - Arn: !GetAtt [ netlifyCMSAuthRedirect2, Arn ]
+          - Arn: !GetAtt [ authRedirect, Arn ]
       MethodResponses:
         - StatusCode: '200'
           ResponseModels:
@@ -122,7 +121,7 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub
           - arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Arn}/invocations
-          - Arn: !GetAtt [ netlifyCMSAuthTokenHandler2, Arn ]
+          - Arn: !GetAtt [ tokenHandler, Arn ]
       MethodResponses:
         - StatusCode: '200'
           ResponseModels:
