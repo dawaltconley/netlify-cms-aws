@@ -1,34 +1,55 @@
-#fThis is the SAM template that represents the architecture of your serverless application
-# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
-
-# The AWSTemplateFormatVersion identifies the capabilities of the template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
-AWSTemplateFormatVersion: 2010-09-09
+AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
   netlify-cms-aws
-
-# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
 Transform:
 - AWS::Serverless-2016-10-31
 
-# Resources declares the AWS resources that you want to include in the stack
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-  # This is a Lambda function config associated with the source code: hello-from-lambda.js
-  helloFromLambdaFunction:
+  netlifyCMSAuthRedirect2:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/hello-from-lambda.helloFromLambdaHandler
+      Handler: redirect.handler
+      CodeUri: src/auth/
       Runtime: nodejs14.x
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 100
-      Description: A Lambda function that returns a static string.
+      Timeout: 3
+      Description: >-
+        An AWS Lambda function for authorizing Netlify CMS through GitHub.
+        Intended as a proxy function triggered via API Gateway.
+        Followed by netlify-cms-auth-token-handler.
       Policies:
-        # Give Lambda basic execution Permission to the helloFromLambda
         - AWSLambdaBasicExecutionRole
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /auth
+            Method: get
+            # RestApiId:
+
+  netlifyCMSAuthTokenHandler2:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: token-handler.handler
+      CodeUri: src/auth/
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 3
+      Description: >-
+        An AWS Lambda function for authorizing Netlify CMS through GitHub.
+        Intended as a proxy function triggered via API Gateway.
+        Preceded by netlify-cms-auth-redirect.
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /callback
+            Method: get
+            # RestApiId:
