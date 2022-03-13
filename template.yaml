@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  netlify-cms-aws
+  Basic infrastructure to self-host Netlify CMS and authenticate through GitHub.
 Transform:
 - AWS::Serverless-2016-10-31
 
@@ -66,6 +66,7 @@ Resources:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: NetlifyCMSGitHubAuth
+      Description: An API for Netlify CMS to authenticate with GitHub.
 
   GitHubAuthResource:
     Type: AWS::ApiGateway::Resource
