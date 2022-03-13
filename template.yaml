@@ -9,8 +9,8 @@ Resources:
   authRedirect:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: redirect.handler
-      CodeUri: src/auth/
+      Handler: auth/redirect.handler
+      CodeUri: src/
       Runtime: nodejs14.x
       Architectures:
         - x86_64
@@ -37,8 +37,8 @@ Resources:
   tokenHandler:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: token-handler.handler
-      CodeUri: src/auth/
+      Handler: auth/token-handler.handler
+      CodeUri: src/
       Runtime: nodejs14.x
       Architectures:
         - x86_64

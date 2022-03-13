@@ -3,11 +3,6 @@
     "description": "netlify-cms-aws",
     "version": "0.0.1",
     "private": true,
-    "dependencies": {
-        "axios": "^0.26.1",
-        "cookie": "^0.4.2",
-        "randomstring": "^1.2.2"
-    },
     "devDependencies": {
         "jest": "^26.6.3"
     },
