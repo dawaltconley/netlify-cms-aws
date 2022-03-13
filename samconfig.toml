@@ -2,9 +2,9 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "NetlifyCMSGitHubAuth"
+stack_name = "NetlifyCMSAuth"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ziym43s8svgx"
-s3_prefix = "NetlifyCMSGitHubAuth"
+s3_prefix = "NetlifyCMSAuth"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
