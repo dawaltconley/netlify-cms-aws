@@ -186,6 +186,5 @@ Outputs:
   NetlifyCMSRestApiId:
     Description: Logical ID for the Netlify CMS Rest API
     Value: !Ref GitHubAuthApi
-  NetlifyCMSRootResourceId:
-    Description: Root resource ID for the Netlify CMS Rest API
-    Value: !GetAtt [ GitHubAuthApi, RootResourceId ]
+    Export:
+      Name: !Sub '${AWS::StackName}-RestApiId'
